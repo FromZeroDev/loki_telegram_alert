@@ -31,5 +31,5 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/fromzerodev/loki_telegram_alert:latest
+            ${{ env.REGISTRY }}/fromzerodev/loki_telegram_alert:${{ github.ref_name }}
