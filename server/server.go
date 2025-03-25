@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/FromZeroDev/loki_telegram_alert/common"
 	"github.com/FromZeroDev/loki_telegram_alert/sndmsstg"
 )
 
@@ -116,8 +117,7 @@ const MPGBotErrorsGroup int64 = -1002080666885
 const CTMBotErrorsGroup int64 = -1002331174364
 
 func sendTelegramMessage(job string, message string) error {
-	// TODO set a configurable option for this that do not require container recreation
-	if job == "cutrans_frontend" {
+	if !common.Config.SendFronted && job == "cutrans_frontend" {
 		return nil
 	}
 
