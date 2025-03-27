@@ -121,7 +121,7 @@ func sendTelegramMessage(job string, message string) error {
 		return nil
 	}
 
-	if job == "ctm_web" {
+	if strings.Contains(job, "ctm") {
 		return sndmsstg.New().SendMessage(sndmsstg.SendMessage{
 			Text:   message,
 			ChatID: CTMBotErrorsGroup,
