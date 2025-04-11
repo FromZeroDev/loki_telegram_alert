@@ -6,10 +6,22 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
-const botApi = "6675594021:AAFOagG_p5BLCIhSjAMcimH8ef4IjcPKL1E"
-const baseURL = "https://api.telegram.org/bot" + botApi + "/"
+var botApi string
+
+func init() {
+	var ok bool
+	botApi, ok = os.LookupEnv("BOT_API")
+	if !ok {
+		panic("BOT_API enviroment variable is not set")
+	}
+}
+
+func baseURL() string {
+	return "https://api.telegram.org/bot" + botApi + "/"
+}
 
 type TelegramError struct {
 	ErrorCode   uint                   `json:"error_code"`
@@ -25,7 +37,7 @@ func send(b []byte, method string) error {
 	client := http.Client{}
 	req, err := http.NewRequest(
 		http.MethodPost,
-		baseURL+method,
+		baseURL()+method,
 		bytes.NewBuffer(b),
 	)
 	if err != nil {
