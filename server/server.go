@@ -6,9 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"slices"
 	"strings"
 
-	"github.com/FromZeroDev/loki_telegram_alert/common"
 	"github.com/FromZeroDev/loki_telegram_alert/sndmsstg"
 )
 
@@ -99,6 +100,9 @@ func send(alerts []Alert) {
 	var errs errors = []error{}
 	for _, a := range alerts {
 		message := createMessage(a)
+		if len(message) >= 4096 {
+			message = message[0:4096]
+		}
 		err := sendTelegramMessage(a.Labels["job"], message)
 		if err != nil {
 			errs = append(errs, err)
@@ -116,11 +120,21 @@ func createMessage(alert Alert) string {
 const MPGBotErrorsGroup int64 = -1002080666885
 const CTMBotErrorsGroup int64 = -1002331174364
 
+func omitByJob(job string) bool {
+	omit, ok := os.LookupEnv("OMIT_JOBS")
+	if !ok || omit == "" {
+		return false
+	}
+	jobs := strings.Split(omit, ",")
+	return slices.ContainsFunc(jobs, func(e string) bool {
+		return strings.TrimSpace(e) == job
+	})
+}
+
 func sendTelegramMessage(job string, message string) error {
-	if !common.Config.SendFronted && job == "cutrans_frontend" {
+	if omitByJob(job) {
 		return nil
 	}
-
 	if strings.Contains(job, "ctm") {
 		return sndmsstg.New().SendMessage(sndmsstg.SendMessage{
 			Text:   message,
